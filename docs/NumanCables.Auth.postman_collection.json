@@ -1,0 +1,191 @@
+{
+  "info": {
+    "name": "Numan Cables API – Auth (Phase 1)",
+    "description": "Auth, approval, OTP stubs for Numan Cables",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "customerId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Signup",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const j = pm.response.json();",
+              "if (j.data && j.data.accessToken) pm.collectionVariables.set('accessToken', j.data.accessToken);",
+              "if (j.data && j.data.user) pm.collectionVariables.set('customerId', j.data.user.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Ali Khan\",\n  \"phone\": \"03001234567\",\n  \"shopName\": \"Khan Electricals\",\n  \"password\": \"secret1\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/signup"
+      }
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const j = pm.response.json();",
+              "if (j.data && j.data.accessToken) pm.collectionVariables.set('accessToken', j.data.accessToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"03001234567\",\n  \"password\": \"secret1\",\n  \"remember\": true\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Me",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/auth/me"
+      }
+    },
+    {
+      "name": "Refresh",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/auth/refresh"
+      }
+    },
+    {
+      "name": "Forgot Password",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"03001234567\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/forgot-password"
+      }
+    },
+    {
+      "name": "Admin Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const j = pm.response.json();",
+              "if (j.data && j.data.accessToken) pm.collectionVariables.set('adminToken', j.data.accessToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"03001234567\",\n  \"password\": \"Admin@12345\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Pending Customers",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "url": "{{baseUrl}}/auth/admin/customers/pending"
+      }
+    },
+    {
+      "name": "Pending Count",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "url": "{{baseUrl}}/auth/admin/customers/pending/count"
+      }
+    },
+    {
+      "name": "Approve Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "url": "{{baseUrl}}/auth/admin/customers/{{customerId}}/approve"
+      }
+    },
+    {
+      "name": "Reject Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Could not verify shop\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/admin/customers/{{customerId}}/reject"
+      }
+    },
+    {
+      "name": "Admin Create Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Retail Owner\",\n  \"shopName\": \"City Wires\",\n  \"phone\": \"03009998877\",\n  \"city\": \"Lahore\",\n  \"address\": \"Hall Road\",\n  \"openingBalance\": 0\n}"
+        },
+        "url": "{{baseUrl}}/auth/admin/customers"
+      }
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/auth/logout"
+      }
+    }
+  ]
+}
